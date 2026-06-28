@@ -22,7 +22,11 @@ services:
       - cb-db-data:/var/lib/postgresql/data
     networks:
       - cb-internal
-    # No published host port — reachable only on the internal network.
+    ports:
+      # Bound to the SERVER's localhost only (not 0.0.0.0) — not exposed to the
+      # internet. Lets DBeaver reach the DB over an SSH tunnel, same as
+      # probody/faucet. Host port 5434 (probody already uses 5432).
+      - "127.0.0.1:5434:5432"
 
   cb-api:
     build:
