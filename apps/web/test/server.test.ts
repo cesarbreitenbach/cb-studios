@@ -19,6 +19,9 @@ beforeAll(async () => {
         services: [{ id: 's1', name: 'Buço', priceCents: 2500, sortOrder: 0 }],
         promo: null,
       }));
+    } else if (req.url === '/api/sitemap-slugs') {
+      res.setHeader('content-type', 'application/json');
+      res.end(JSON.stringify(['bruna', 'outro']));
     } else { res.statusCode = 404; res.end('{"error":"not_found"}'); }
   });
   await new Promise<void>((r) => stub.listen(0, r));
@@ -46,5 +49,13 @@ describe('SSR server', () => {
     const app = await createServer({ apiBase, origin: 'https://x.test', prod: true });
     const res = await request(app).get('/robots.txt');
     expect(res.text).toContain('Sitemap: https://x.test/sitemap.xml');
+  });
+
+  it('GET /sitemap.xml contains loc entries for all slugs', async () => {
+    const app = await createServer({ apiBase, origin: 'https://x.test', prod: true });
+    const res = await request(app).get('/sitemap.xml');
+    expect(res.status).toBe(200);
+    expect(res.text).toContain('<loc>https://x.test/s/bruna</loc>');
+    expect(res.text).toContain('<loc>https://x.test/s/outro</loc>');
   });
 });

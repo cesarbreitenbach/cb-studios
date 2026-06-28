@@ -1,4 +1,5 @@
 import express from 'express';
+import { fileURLToPath } from 'node:url';
 import { render } from './src/entry-server.js';
 import { buildHead } from './src/ssr/head.js';
 import { renderDocument } from './src/ssr/document.js';
@@ -13,14 +14,18 @@ export async function createServer(opts: { apiBase: string; origin: string; prod
 
   app.get('/sitemap.xml', async (_req, res) => {
     const r = await fetch(`${opts.apiBase}/api/sitemap-slugs`).catch(() => null);
-    const slugs: string[] = r && r.ok ? await r.json() : [];
+    let slugs: string[] = [];
+    if (r && r.ok) {
+      try { slugs = await r.json(); } catch { slugs = []; }
+    }
     res.type('application/xml').send(sitemapXml(slugs, opts.origin));
   });
 
   app.get('/s/:slug', async (req, res) => {
     const r = await fetch(`${opts.apiBase}/api/studios/${req.params.slug}`).catch(() => null);
     if (!r || !r.ok) return res.status(404).type('html').send('<h1>Studio não encontrado</h1>');
-    const view = await r.json();
+    let view: unknown;
+    try { view = await r.json(); } catch { return res.status(404).type('html').send('<h1>Studio não encontrado</h1>'); }
     const appHtml = render(view);
     const head = buildHead(view, { url: `${opts.origin}/s/${req.params.slug}` });
     res.status(200).type('html').send(renderDocument({
@@ -32,7 +37,8 @@ export async function createServer(opts: { apiBase: string; origin: string; prod
 }
 
 // Boot when run directly
-if (process.argv[1] && process.argv[1].endsWith('server.ts')) {
+const isMain = process.argv[1] === fileURLToPath(import.meta.url);
+if (isMain) {
   const app = await createServer({
     apiBase: process.env.API_BASE ?? 'http://localhost:3001',
     origin: process.env.ORIGIN ?? 'http://localhost:3000',
