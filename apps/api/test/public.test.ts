@@ -23,3 +23,14 @@ describe('GET /api/studios/:slug', () => {
     expect(res.body.services[0].priceCents).toBe(2500);
   });
 });
+
+describe('GET /api/sitemap-slugs', () => {
+  it('returns published studio slugs', async () => {
+    await db.insert(studios).values({ slug: 'alice', name: 'Alice', published: true });
+    await db.insert(studios).values({ slug: 'draft', name: 'Draft', published: false });
+    const res = await request(app).get('/api/sitemap-slugs');
+    expect(res.status).toBe(200);
+    expect(res.body).toContain('alice');
+    expect(res.body).not.toContain('draft');
+  });
+});
