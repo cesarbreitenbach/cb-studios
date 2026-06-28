@@ -5,10 +5,10 @@ import { eq } from 'drizzle-orm';
 
 const { pool, db } = makeDb(process.env.DATABASE_URL!);
 
-const existing = await db.select().from(studios).where(eq(studios.slug, 'bruna-lausmann'));
+const existing = await db.select().from(studios).where(eq(studios.slug, 'bruna'));
 if (existing.length === 0) {
   const [s] = await db.insert(studios).values({
-    slug: 'bruna-lausmann',
+    slug: 'bruna',
     name: 'Bruna Lausmann',
     defaultTheme: 'B',
     whatsapp: '5545998443696',
@@ -41,8 +41,8 @@ if (existing.length === 0) {
     oldPriceCents: 16500,
     active: true,
   });
-  console.log('seeded bruna-lausmann (login bruna@cbstudios.com.br / bruna123)');
+  console.log('seeded bruna (login bruna@cbstudios.com.br / bruna123)');
 } else {
-  console.log('bruna-lausmann already seeded');
+  console.log('bruna already seeded');
 }
 await pool.end();

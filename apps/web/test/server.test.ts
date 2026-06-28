@@ -58,4 +58,27 @@ describe('SSR server', () => {
     expect(res.text).toContain('<loc>https://x.test/s/bruna</loc>');
     expect(res.text).toContain('<loc>https://x.test/s/outro</loc>');
   });
+
+  it('subdomain mode: GET / on a studio host renders that studio with its own canonical', async () => {
+    const app = await createServer({ apiBase, origin: 'https://agendou.vip', prod: true, baseDomain: 'agendou.vip' });
+    const res = await request(app).get('/').set('Host', 'bruna.agendou.vip');
+    expect(res.status).toBe(200);
+    expect(res.text).toContain('Bruna Lausmann');
+    expect(res.text).toContain('Buço');
+    expect(res.text).toContain('https://bruna.agendou.vip');
+  });
+
+  it('subdomain mode: GET /admin on a studio host serves the noindex admin shell', async () => {
+    const app = await createServer({ apiBase, origin: 'https://agendou.vip', prod: true, baseDomain: 'agendou.vip' });
+    const res = await request(app).get('/admin').set('Host', 'bruna.agendou.vip');
+    expect(res.status).toBe(200);
+    expect(res.text).toContain('name="robots" content="noindex"');
+    expect(res.text).toContain('id="root"');
+  });
+
+  it('apex host has no studio at / (falls through to 404)', async () => {
+    const app = await createServer({ apiBase, origin: 'https://agendou.vip', prod: true, baseDomain: 'agendou.vip' });
+    const res = await request(app).get('/').set('Host', 'agendou.vip');
+    expect(res.status).toBe(404);
+  });
 });
