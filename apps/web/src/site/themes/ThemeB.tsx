@@ -11,7 +11,6 @@ export default function ThemeB({ view }: { view: StudioView }) {
     <div style={{ width: '100%', minHeight: '800px', background: 'radial-gradient(120% 70% at 50% 0%, #3a2330 0%, #241620 55%, #1a1018 100%)', color: '#efe3e6', fontFamily: "'Jost',sans-serif" }}>
       <div style={{ padding: '60px 32px 36px', textAlign: 'center' }}>
         <div style={{ fontSize: '11px', letterSpacing: '.36em', textTransform: 'uppercase', color: '#caa07d' }}>Estúdio de Depilação</div>
-        <span style={{ display: 'none' }}>{studio.name}</span>
         <h1 style={{ fontFamily: "'Cormorant Garamond',serif", fontWeight: 400, fontSize: '58px', lineHeight: .92, margin: '20px 0 0', color: '#f3dde2' }}>{studio.name.split(' ')[0]}</h1>
         <h1 style={{ fontFamily: "'Cormorant Garamond',serif", fontWeight: 400, fontStyle: 'italic', fontSize: '46px', lineHeight: 1, margin: '2px 0 0', color: '#e3a6b5' }}>{studio.name.split(' ').slice(1).join(' ')}</h1>
         <div style={{ width: '46px', height: '1px', background: 'linear-gradient(90deg,transparent,#caa07d,transparent)', margin: '24px auto' }} />

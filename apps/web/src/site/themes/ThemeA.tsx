@@ -8,7 +8,6 @@ export default function ThemeA({ view }: { view: StudioView }) {
     <div style={{ width: '100%', minHeight: '800px', background: '#f6f1ec', color: '#2c2630', fontFamily: "'Jost',sans-serif" }}>
       <div style={{ padding: '58px 32px 34px' }}>
         <div style={{ fontSize: '11px', letterSpacing: '.34em', textTransform: 'uppercase', color: '#b08e7f' }}>Estúdio de Depilação</div>
-        <span style={{ display: 'none' }}>{studio.name}</span>
         <h1 style={{ fontFamily: "'Cormorant Garamond',serif", fontWeight: 500, fontSize: '55px', lineHeight: .95, margin: '20px 0 0' }}>
           {studio.name.split(' ')[0]}<br /><em style={{ fontStyle: 'italic', color: '#9c5a6b' }}>{studio.name.split(' ').slice(1).join(' ')}</em>
         </h1>

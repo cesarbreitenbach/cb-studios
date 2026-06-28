@@ -16,7 +16,8 @@ describe('themes', () => {
     it(`Theme ${t} renders name, service, promo, wa link`, () => {
       const C = THEME_COMPONENTS[t];
       const html = renderToString(<C view={base} />);
-      expect(html).toContain('Bruna Lausmann');
+      expect(html).toContain('Bruna');
+      expect(html).toContain('Lausmann');
       expect(html).toContain('Buço');
       expect(html).toContain('R$');
       expect(html).toContain('Combo');
