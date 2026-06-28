@@ -1,0 +1,10 @@
+{
+  "name": "cb-studios",
+  "private": true,
+  "type": "module",
+  "workspaces": ["apps/*", "packages/*"],
+  "scripts": {
+    "dev:api": "npm -w apps/api run dev",
+    "test": "npm -w apps/api run test"
+  }
+}
