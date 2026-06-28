@@ -1,0 +1,7 @@
+# Add this block to Probody's existing Caddyfile: wildcard + apex TLS via Cloudflare DNS-01, proxied to cb-web on the shared "caddy" docker network.
+*.agendou.vip, agendou.vip {
+    tls {
+        dns cloudflare {env.CLOUDFLARE_API_TOKEN}
+    }
+    reverse_proxy cb-web:3000
+}

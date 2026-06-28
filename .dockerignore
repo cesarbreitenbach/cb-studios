@@ -1,0 +1,25 @@
+# Dependencies — reinstalled inside the image via `npm ci`.
+node_modules
+**/node_modules
+
+# Build output — produced inside the web build stage.
+dist
+**/dist
+
+# VCS / tooling
+.git
+.gitignore
+.superpowers
+
+# Logs
+*.log
+
+# Secrets / local env — never bake into an image.
+.env
+**/.env
+.env.*
+**/.env.*
+
+# Docs
+docs
+**/docs

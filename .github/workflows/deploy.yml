@@ -1,0 +1,43 @@
+# Adjust to match the Luckyblock deploy pattern (host path, secret names) — confirm with the operator.
+name: Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+# Least privilege: deploy only reads the repo; the SSH deploy uses secrets.
+permissions:
+  contents: read
+
+# Only one deploy at a time; let an in-flight deploy finish rather than
+# cancelling it mid-way.
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+jobs:
+  ci:
+    name: CI gate
+    uses: ./.github/workflows/ci.yml
+
+  deploy:
+    name: Deploy to production
+    needs: ci
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy over SSH
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          script_stop: true
+          script: |
+            set -euo pipefail
+            # Repo dir on the server — adjust to the Luckyblock host path.
+            cd ~/cb-studios
+            git pull --ff-only
+            docker compose -f docker-compose.prod.yml up -d --build
+            docker compose -f docker-compose.prod.yml exec -T cb-api npm -w apps/api run db:migrate
