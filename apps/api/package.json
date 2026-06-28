@@ -10,6 +10,7 @@
     "db:seed": "tsx seed.ts"
   },
   "dependencies": {
+    "@cb/shared": "*",
     "express": "^4.19.2",
     "express-async-errors": "^3.1.1",
     "cookie-parser": "^1.4.6",
