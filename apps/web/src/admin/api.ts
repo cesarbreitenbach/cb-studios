@@ -41,7 +41,11 @@ export const adminApi = {
   },
 
   async changePassword(currentPassword: string, newPassword: string) {
-    const r = await fetch('/api/admin/password', opts('POST', { currentPassword, newPassword }));
-    return { ok: r.ok, error: r.ok ? null : ((await r.json().catch(() => ({}))).error ?? 'error') };
+    try {
+      const r = await fetch('/api/admin/password', opts('POST', { currentPassword, newPassword }));
+      return { ok: r.ok, error: r.ok ? null : ((await r.json().catch(() => ({}))).error ?? 'error') };
+    } catch {
+      return { ok: false, error: 'network' };
+    }
   },
 };

@@ -15,7 +15,7 @@ export function adminPasswordRouter(db: any) {
     if (!admin || !(await verifyPassword(currentPassword ?? '', admin.passwordHash))) {
       return res.status(400).json({ error: 'invalid_current_password' });
     }
-    if (!newPassword || newPassword.length < 8) {
+    if (typeof newPassword !== 'string' || newPassword.length < 8) {
       return res.status(400).json({ error: 'weak_password' });
     }
     const passwordHash = await hashPassword(newPassword);
