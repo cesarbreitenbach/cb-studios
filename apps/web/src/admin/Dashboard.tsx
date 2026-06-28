@@ -4,12 +4,14 @@ import { Appearance } from './tabs/Appearance.js';
 import { Services } from './tabs/Services.js';
 import { PromoTab } from './tabs/PromoTab.js';
 import { StudioTab } from './tabs/StudioTab.js';
+import { PasswordTab } from './tabs/PasswordTab.js';
 
 const TABS = [
   { id: 'aparencia', label: 'Aparência', el: <Appearance /> },
   { id: 'servicos', label: 'Serviços', el: <Services /> },
   { id: 'promo', label: 'Promo', el: <PromoTab /> },
   { id: 'studio', label: 'Studio', el: <StudioTab /> },
+  { id: 'senha', label: 'Senha', el: <PasswordTab /> },
 ];
 
 export function Dashboard({ onLogout }: { onLogout: () => void }) {
