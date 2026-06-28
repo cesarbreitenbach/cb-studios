@@ -34,6 +34,7 @@ export function adminServicesRouter(db: any) {
     const fields: any = {};
     for (const k of ['name', 'priceCents', 'sortOrder'] as const)
       if (req.body?.[k] !== undefined) fields[k] = req.body[k];
+    if (Object.keys(fields).length === 0) return res.status(400).json({ error: 'no_fields' });
     const [row] = await db.update(services).set(fields)
       .where(and(eq(services.id, req.params.id), eq(services.studioId, req.studioId!)))
       .returning();

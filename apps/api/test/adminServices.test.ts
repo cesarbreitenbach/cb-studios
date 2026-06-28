@@ -43,6 +43,17 @@ describe('admin services', () => {
     expect(del.status).toBe(204);
   });
 
+  it('rejects PATCH with no allowed fields (empty body)', async () => {
+    const s = await studioWithAdmin('empty', 'empty@x.com');
+    const cookie = await login('empty@x.com');
+    const [svc] = await db.insert(services)
+      .values({ studioId: s.id, name: 'Haircut', priceCents: 1000, sortOrder: 0 }).returning();
+    const res = await request(app).patch(`/api/admin/services/${svc.id}`)
+      .set('Cookie', cookie).send({});
+    expect(res.status).toBe(400);
+    expect(res.body).toEqual({ error: 'no_fields' });
+  });
+
   it('cannot touch another studio\'s service', async () => {
     const a = await studioWithAdmin('a', 'a@x.com');
     await studioWithAdmin('b', 'b@x.com');
