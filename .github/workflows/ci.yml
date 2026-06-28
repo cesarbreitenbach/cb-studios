@@ -53,7 +53,11 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm ci
+        # Drop the (macOS-generated) lockfile and install fresh so the linux
+        # rollup/esbuild native binaries resolve — `npm ci` honors a
+        # cross-platform lockfile and omits them (npm/cli#4828). Same approach
+        # the Dockerfiles use.
+        run: rm -f package-lock.json && npm install --no-audit --no-fund
 
       - name: Ensure test database exists
         # The postgres service already creates cbstudios_test via POSTGRES_DB;
