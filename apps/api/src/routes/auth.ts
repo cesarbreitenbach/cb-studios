@@ -5,7 +5,12 @@ import { verifyPassword } from '../auth/password.js';
 import { signToken } from '../auth/jwt.js';
 import { requireAuth } from '../auth/middleware.js';
 
-const cookieOpts = { httpOnly: true, sameSite: 'lax' as const, path: '/' };
+const cookieOpts = {
+  httpOnly: true,
+  sameSite: 'lax' as const,
+  path: '/',
+  secure: process.env.NODE_ENV === 'production',
+};
 
 export function authRouter(db: any) {
   const r = Router();
