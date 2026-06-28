@@ -1,13 +1,18 @@
 # CB Studios — production compose.
-# Secrets (POSTGRES_PASSWORD, JWT_SECRET) come from a gitignored .env file
-# placed next to this compose on the server. NO secret values are hardcoded.
+# Runs on the same host as Probody / cb-faucet (Luckyblock) / cb-fitness,
+# behind the shared Probody Caddy (container "probody_proxy", image caddy:latest).
 #
-# TLS for *.agendou.vip is terminated by the existing Probody Caddy container,
-# which reaches cb-web over the shared external "caddy" network by service name.
+# Integration mirrors cb-faucet: this stack owns an EXTERNAL docker network
+# "cb-studios-net"; the Probody Caddy joins that network and reverse-proxies to
+# cb_studios_web:3000 by container name (exactly like it reaches cb_faucet_app).
+#
+# Secrets (POSTGRES_PASSWORD, JWT_SECRET) come from a gitignored .env placed
+# next to this compose on the server. NO secret values are hardcoded.
 
 services:
   cb-db:
     image: postgres:16
+    container_name: cb_studios_db
     restart: unless-stopped
     environment:
       POSTGRES_USER: cb
@@ -23,6 +28,7 @@ services:
     build:
       context: .
       dockerfile: apps/api/Dockerfile
+    container_name: cb_studios_api
     restart: unless-stopped
     environment:
       DATABASE_URL: postgres://cb:${POSTGRES_PASSWORD}@cb-db:5432/cbstudios
@@ -41,6 +47,7 @@ services:
     build:
       context: .
       dockerfile: apps/web/Dockerfile
+    container_name: cb_studios_web
     restart: unless-stopped
     environment:
       API_BASE: http://cb-api:3001
@@ -55,8 +62,9 @@ services:
     networks:
       # Internal network for talking to cb-api.
       - cb-internal
-      # Shared external network so Probody's Caddy can reverse_proxy to cb-web:3000.
-      - caddy
+      # Shared external network so Probody's Caddy can reverse_proxy to
+      # cb_studios_web:3000 (Caddy joins this same network — see DEPLOY.md).
+      - cb-studios-net
 
 volumes:
   cb-db-data:
@@ -64,5 +72,6 @@ volumes:
 networks:
   cb-internal:
     driver: bridge
-  caddy:
+  cb-studios-net:
     external: true
+    name: cb-studios-net

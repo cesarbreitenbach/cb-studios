@@ -1,7 +1,34 @@
-# Add this block to Probody's existing Caddyfile: wildcard + apex TLS via Cloudflare DNS-01, proxied to cb-web on the shared "caddy" docker network.
-*.agendou.vip, agendou.vip {
-    tls {
-        dns cloudflare {env.CLOUDFLARE_API_TOKEN}
-    }
-    reverse_proxy cb-web:3000
+# Add to Probody's Caddyfile (Probody/backend/Caddyfile).
+#
+# DEFAULT — one block per studio, automatic HTTPS via HTTP-01 (works with the
+# existing caddy:latest image, exactly like the luckyblock.win blocks; no
+# Cloudflare token, no Caddy rebuild). cb_studios_web is reachable because the
+# Caddy container also joins the external "cb-studios-net" network.
+#
+# Requires a DNS A record for each host (e.g. bruna.agendou.vip -> SERVER_IP).
+
+bruna.agendou.vip {
+    reverse_proxy cb_studios_web:3000
 }
+
+# Add another block per new studio:
+# studiox.agendou.vip {
+#     reverse_proxy cb_studios_web:3000
+# }
+
+# ---------------------------------------------------------------------------
+# OPTIONAL UPGRADE — wildcard *.agendou.vip (zero per-studio Caddy edits).
+# A wildcard certificate needs a DNS-01 challenge, which requires the
+# Cloudflare DNS plugin. The stock caddy:latest does NOT include it, so this
+# means rebuilding the shared Caddy image:
+#   xcaddy build --with github.com/caddy-dns/cloudflare
+# then give Caddy a Cloudflare API token (Zone:DNS:Edit on agendou.vip) as
+# env CLOUDFLARE_API_TOKEN, add a wildcard A record *.agendou.vip -> SERVER_IP,
+# and replace the per-studio blocks above with:
+#
+# *.agendou.vip {
+#     tls {
+#         dns cloudflare {env.CLOUDFLARE_API_TOKEN}
+#     }
+#     reverse_proxy cb_studios_web:3000
+# }

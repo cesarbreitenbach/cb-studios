@@ -1,4 +1,5 @@
-# Adjust to match the Luckyblock deploy pattern (host path, secret names) — confirm with the operator.
+# Deploy — mirrors the cb-faucet (Luckyblock) pattern: push to main -> CI gate
+# -> SSH to the shared server and run the server-side deploy script.
 name: Deploy
 
 on:
@@ -10,10 +11,9 @@ on:
 permissions:
   contents: read
 
-# Only one deploy at a time; let an in-flight deploy finish rather than
-# cancelling it mid-way.
+# Only one production deploy at a time.
 concurrency:
-  group: deploy-production
+  group: production-deploy
   cancel-in-progress: false
 
 jobs:
@@ -25,19 +25,19 @@ jobs:
     name: Deploy to production
     needs: ci
     runs-on: ubuntu-latest
-
     steps:
-      - name: Deploy over SSH
-        uses: appleboy/ssh-action@v1.2.0
+      - name: Setup SSH agent
+        uses: webfactory/ssh-agent@v0.9.0
         with:
-          host: ${{ secrets.DEPLOY_HOST }}
-          username: ${{ secrets.DEPLOY_USER }}
-          key: ${{ secrets.DEPLOY_SSH_KEY }}
-          script_stop: true
-          script: |
-            set -euo pipefail
-            # Repo dir on the server — adjust to the Luckyblock host path.
-            cd ~/cb-studios
-            git pull --ff-only
-            docker compose -f docker-compose.prod.yml up -d --build
-            docker compose -f docker-compose.prod.yml exec -T cb-api npm -w apps/api run db:migrate
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Add known_hosts
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_KNOWN_HOSTS }}" >> ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/known_hosts
+
+      - name: Run deploy script on server
+        run: |
+          ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} \
+            "cd ~/cb-studios && ./scripts/ci-deploy.sh ${{ github.sha }}"
