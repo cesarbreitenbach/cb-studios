@@ -1,0 +1,13 @@
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: cb
+      POSTGRES_PASSWORD: cb
+      POSTGRES_DB: cbstudios
+    ports:
+      - "5435:5432"
+    volumes:
+      - cbdata:/var/lib/postgresql/data
+volumes:
+  cbdata:
